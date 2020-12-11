@@ -30,7 +30,7 @@ def snapshots():
 @snapshots.command('list')
 @click.option('--project', default=None, help="Only snapshots for project (tag Project:<name>)")
 
-def list_volumes(project):
+def list_snapshots(project):
     "List EC2 snapshots"
 
     instances = filter_instances(project)
@@ -46,7 +46,6 @@ def list_volumes(project):
                     s.progress,
                     s.start_time.strftime("%c")
                  )))
-
     return
 
 
@@ -77,6 +76,22 @@ def list_volumes(project):
 @cli.group('instances')
 def instances():
     """Commands for instances"""
+
+
+@instances.command('snapshot', help="Create snapshots of all volumes")
+@click.option('--project', default=None,help="Only create snapshots for project (tag Project:<name>)")
+
+def create_inst_snapshots(project):
+    "Create snapshots for EC2 instances"
+
+    instances = filter_instances(project)
+
+    for i in instances:
+        for v in i.volumes.all():
+            #create snapshot Command
+            print("Creating snapshot of {0}".format(v.id))
+            v.create_snapshot(Description="Created by SnapshotAlyzer 30000")
+    return
 
 #@click.command()
 @instances.command('list')
